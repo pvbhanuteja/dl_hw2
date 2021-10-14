@@ -56,9 +56,9 @@ def preprocess_image(image, training):
 
     ### YOUR CODE HERE
     # Subtract off the mean and divide by the standard deviation of the pixels.
-    # mean = np.mean(image, axis=(1,2), keepdims=True)
-    # std = np.std(image, axis=(1,2), keepdims=True)
-    # image = (image - mean )/ std
+    mean = np.mean(image, axis=(0,1), keepdims=True)
+    std = np.std(image, axis=(0,1), keepdims=True)
+    image = (image - mean )/ std
     ### YOUR CODE HERE
 
     return image
