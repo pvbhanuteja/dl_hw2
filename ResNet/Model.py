@@ -46,7 +46,7 @@ class Cifar(nn.Module):
             ### YOUR CODE HERE
             # Set the learning rate for this epoch
             # Usage example: divide the initial learning rate by 10 after several epochs
-            self.scheduler.step()
+            
             ### YOUR CODE HERE
             
             for i in range(num_batches):
@@ -70,7 +70,7 @@ class Cifar(nn.Module):
                 self.optimizer.step()
 
                 print('Batch {:d}/{:d} Loss {:.6f}'.format(i, num_batches, loss), end='\r', flush=True)
-            
+            self.scheduler.step()
             duration = time.time() - start_time
             print('Epoch {:d} Loss {:.6f} Duration {:.3f} seconds.'.format(epoch, loss, duration))
 
