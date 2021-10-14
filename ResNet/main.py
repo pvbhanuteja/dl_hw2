@@ -25,7 +25,7 @@ def main(config):
     print("--- Preparing Data ---")
 
     ### YOUR CODE HERE
-    data_dir = "/content/dl_hw2/ResNet/cifar-10-python/cifar-10-batches-py"
+    data_dir = "./cifar-10-python/cifar-10-batches-py"
     ### YOUR CODE HERE
 
     x_train, y_train, x_test, y_test = load_data(data_dir)
