@@ -25,13 +25,13 @@ def main(config):
     print("--- Preparing Data ---")
 
     ### YOUR CODE HERE
-    data_dir = "ResNet\cifar-10-python\cifar-10-batches-py"
+    data_dir = "/content/dl_hw2/ResNet/cifar-10-python/cifar-10-batches-py"
     ### YOUR CODE HERE
 
     x_train, y_train, x_test, y_test = load_data(data_dir)
     x_train_new, y_train_new, x_valid, y_valid = train_vaild_split(x_train, y_train)
 
-    model = Cifar(config)
+    model = Cifar(config).cuda()
 
     ### YOUR CODE HERE
     # First step: use the train_new set and the valid set to choose hyperparameters.
@@ -48,6 +48,6 @@ def main(config):
     ### END CODE HERE
 
 if __name__ == "__main__":
-    os.environ['CUDA_VISIBLE_DEVICES'] = '9'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     config = configure()
     main(config)

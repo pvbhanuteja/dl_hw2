@@ -60,8 +60,8 @@ class Cifar(nn.Module):
                 for image in batch_x_train:
                     curr_batch_x_train.append(parse_record(image,True))
                 curr_batch_x_train = np.array(curr_batch_x_train)
-                curr_batch_x_train = torch.FloatTensor(curr_batch_x_train)
-                batch_y_train = torch.LongTensor(batch_y_train)
+                curr_batch_x_train = torch.cuda.FloatTensor(curr_batch_x_train)
+                batch_y_train = torch.cuda.LongTensor(batch_y_train)
                 ### YOUR CODE HERE
                 self.optimizer.zero_grad()
                 outputs = self.network(curr_batch_x_train)
