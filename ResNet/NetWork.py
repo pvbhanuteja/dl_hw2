@@ -83,7 +83,7 @@ class ResNet(nn.Module):
         if self.resnet_version == 1:
             outputs = self.batch_norm_relu_start(outputs)
         for i in range(3):
-            print('------------------------------------------',i)
+            # print('------------------------------------------',i)
             outputs = self.stack_layers[i](outputs)
         outputs = self.output_layer(outputs)
         return outputs
@@ -141,7 +141,7 @@ class standard_block(nn.Module):
 
     def forward(self, inputs: Tensor) -> Tensor:
         ### YOUR CODE HERE
-        print(type(inputs))
+        # print(type(inputs))
         out = nn.functional.relu(self.bn1(self.conv1(inputs)))
         out = nn.functional.relu(self.bn2(self.conv2(out)))
         out += self.shortcut(inputs)
