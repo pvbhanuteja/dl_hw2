@@ -239,39 +239,34 @@ class stack_layer(nn.Module):
 
                     # filters_in = filters_out
                 layers.append(standard_block(filters_out,projection_shortcut,strides,filters_out))
-                print('filters_out',filters_out,'\n','filters_in',filters_in)
+                # print('filters_out',filters_out,'\n','filters_in',filters_in)
         if block_fn is bottleneck_block:
             layers = []
             for i in range(resnet_size):
-                print(i)
                 projection_shortcut = None
                 if filters_out != filters_in:
                     if filters_out == 4*first_num_filters:
                         filters_in = first_num_filters
                         projection_shortcut = 'yes'
                         layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
-                        print('filters_out',filters_out,'\n','filters_in',filters_in)
                         filters_in = filters_out
                     if filters_out == 2*4*first_num_filters:
                         filters_in = 4*first_num_filters
                         projection_shortcut = 'yes'
                         layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
-                        print('filters_out',filters_out,'\n','filters_in',filters_in)
                         filters_in = filters_out
                     if filters_out == 4*4*first_num_filters:
                         filters_in = 2*4*first_num_filters
                         projection_shortcut = 'yes'
                         layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
-                        print('filters_out',filters_out,'\n','filters_in',filters_in)
                         filters_in = filters_out
                     # print('filters_out',filters_out,'\n','filters_in',filters_in)
                 else:
                     # filters_in = filters_out
                     layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_out))
-                    print('filters_out',filters_out,'\n','filters_in',filters_in)
+                    # print('filters_out',filters_out,'\n','filters_in',filters_in)
 
         self.layer = nn.Sequential(*layers)
-        print(self.layer)
 
         ### END CODE HERE
         # projection_shortcut = ?
