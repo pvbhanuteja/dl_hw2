@@ -3,8 +3,8 @@ import time
 import torch
 import torch.nn as nn
 import numpy as np
+# import torchinfo
 from tqdm import tqdm
-
 from NetWork import ResNet
 from ImageUtils import parse_record
 
@@ -26,7 +26,7 @@ class Cifar(nn.Module):
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.SGD(self.network.parameters(), lr=0.1,momentum=0.9, weight_decay=5e-4)
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,step_size=10,gamma=0.1)
-
+        # print(summary(model,(3, 32, 32)))
         ### YOUR CODE HERE
     
     def train(self, x_train, y_train, max_epoch):
