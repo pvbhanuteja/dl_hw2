@@ -163,19 +163,43 @@ class bottleneck_block(nn.Module):
     """
     def __init__(self, filters, projection_shortcut, strides, first_num_filters) -> None:
         super(bottleneck_block, self).__init__()
-
         ### YOUR CODE HERE
         # Hint: Different from standard lib implementation, you need pay attention to 
         # how to define in_channel of the first bn and conv of each block based on
         # Args given above.
-        pass
+        self.bn1 = nn.BatchNorm2d(filters)
+        self.conv1 = nn.Conv2d(filters, int(filters/4), kernel_size=1, stride=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(int(filters/4))
+        self.conv2 = nn.Conv2d(int(filters/4), int(filters/4), kernel_size=3,stride=1, padding=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(int(filters/4))
+        self.conv3 = nn.Conv2d(int(filters/4), filters, kernel_size=1,stride=1, bias=False)
+        self.shortcut = nn.Sequential()
+
+        if projection_shortcut is not None:
+            self.bn1 = nn.BatchNorm2d(first_num_filters)
+            self.conv1 = nn.Conv2d(first_num_filters, int(filters/4), kernel_size=1, stride=strides, bias=False)
+            self.bn2 = nn.BatchNorm2d(int(filters/4))
+            self.conv2 = nn.Conv2d(int(filters/4), int(filters/4), kernel_size=3,stride=1, padding=1, bias=False)
+            self.bn3 = nn.BatchNorm2d(int(filters/4))
+            self.conv3 = nn.Conv2d(int(filters/4), filters, kernel_size=1,stride=1, bias=False)
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(first_num_filters, filters ,kernel_size=1, stride=strides, bias=False),
+                nn.BatchNorm2d(filters)
+            )
         ### YOUR CODE HERE
     
     def forward(self, inputs: Tensor) -> Tensor:
         ### YOUR CODE HERE
         # The projection shortcut should come after the first batch norm and ReLU
 		# since it performs a 1x1 convolution.
-        pass
+        out = nn.functional.relu(self.bn1(inputs))
+        out = self.conv1(out)
+        out = nn.functional.relu(self.bn2(out))
+        out = self.conv2(out)
+        out = nn.functional.relu(self.bn3(out))
+        out = self.conv3(out)
+        out += self.shortcut(inputs)
+        return out
         ### YOUR CODE HERE
 
 class stack_layer(nn.Module):
@@ -196,27 +220,58 @@ class stack_layer(nn.Module):
         filters_out = filters * 4 if block_fn is bottleneck_block else filters
         filters_in = first_num_filters
         
+        if block_fn is standard_block:
+            layers = []
+            for i in range(resnet_size):
+                projection_shortcut = None
+                if filters_out != filters_in:
+                    if filters_out == 2*first_num_filters:
+                        filters_in = first_num_filters
+                        projection_shortcut = 'yes'
+                        layers.append(standard_block(filters_out,projection_shortcut,strides,filters_in))
+                        filters_in = filters_out
+                    if filters_out == 4*first_num_filters:
+                        filters_in = 2*first_num_filters
+                        projection_shortcut = 'yes'
+                        layers.append(standard_block(filters_out,projection_shortcut,strides,filters_in))
+                        filters_in = filters_out
+                    # print('filters_out',filters_out,'\n','filters_in',filters_in)
 
-        layers = []
-        for i in range(resnet_size):
-            projection_shortcut = None
-            if filters_out != filters_in:
-                if filters_out == 2*first_num_filters:
-                    filters_in = first_num_filters
-                    projection_shortcut = 'yes'
-                    layers.append(standard_block(filters_out,projection_shortcut,strides,filters_in))
-                    filters_in = filters_out
-                if filters_out == 4*first_num_filters:
-                    filters_in = 2*first_num_filters
-                    projection_shortcut = 'yes'
-                    layers.append(standard_block(filters_out,projection_shortcut,strides,filters_in))
-                    filters_in = filters_out
-                # print('filters_out',filters_out,'\n','filters_in',filters_in)
+                    # filters_in = filters_out
+                layers.append(standard_block(filters_out,projection_shortcut,strides,filters_out))
+                print('filters_out',filters_out,'\n','filters_in',filters_in)
+        if block_fn is bottleneck_block:
+            layers = []
+            for i in range(resnet_size):
+                print(i)
+                projection_shortcut = None
+                if filters_out != filters_in:
+                    if filters_out == 4*first_num_filters:
+                        filters_in = first_num_filters
+                        projection_shortcut = 'yes'
+                        layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
+                        print('filters_out',filters_out,'\n','filters_in',filters_in)
+                        filters_in = filters_out
+                    if filters_out == 2*4*first_num_filters:
+                        filters_in = 4*first_num_filters
+                        projection_shortcut = 'yes'
+                        layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
+                        print('filters_out',filters_out,'\n','filters_in',filters_in)
+                        filters_in = filters_out
+                    if filters_out == 4*4*first_num_filters:
+                        filters_in = 2*4*first_num_filters
+                        projection_shortcut = 'yes'
+                        layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_in))
+                        print('filters_out',filters_out,'\n','filters_in',filters_in)
+                        filters_in = filters_out
+                    # print('filters_out',filters_out,'\n','filters_in',filters_in)
+                else:
+                    # filters_in = filters_out
+                    layers.append(bottleneck_block(filters_out,projection_shortcut,strides,filters_out))
+                    print('filters_out',filters_out,'\n','filters_in',filters_in)
 
-                # filters_in = filters_out
-            layers.append(standard_block(filters_out,projection_shortcut,strides,filters_out))
-            print('filters_out',filters_out,'\n','filters_in',filters_in)
         self.layer = nn.Sequential(*layers)
+        print(self.layer)
 
         ### END CODE HERE
         # projection_shortcut = ?
