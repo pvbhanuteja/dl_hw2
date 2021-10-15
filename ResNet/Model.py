@@ -84,14 +84,18 @@ class Cifar(nn.Module):
         for checkpoint_num in checkpoint_num_list:
             checkpointfile = os.path.join(self.config.modeldir, 'model-%d.ckpt'%(checkpoint_num))
             self.load(checkpointfile)
-
+            
             preds = []
             for i in tqdm(range(x.shape[0])):
                 ### YOUR CODE HERE
-                pass
+                inp = parse_record(x[i],False)
+                inp = np.expand_dims(inp, axis=0)
+                inp = torch.cuda.FloatTensor(inp)
+                outa = self.network(inp)
+                _, predict = torch.max(outa, 1)
+                preds.append(predict)
                 ### END CODE HERE
-
-            y = torch.tensor(y)
+            y = torch.cuda.tensor(y)
             preds = torch.tensor(preds)
             print('Test accuracy: {:.4f}'.format(torch.sum(preds==y)/y.shape[0]))
     
